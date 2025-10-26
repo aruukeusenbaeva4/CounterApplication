@@ -10,12 +10,14 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.counterapplication.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    var counter=0
+
+    private var counter = 0
     private lateinit var binding: ActivityMainBinding
+    private lateinit var pref: CounterPref
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        var counterPref =CounterPref(context = this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -23,13 +25,24 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        binding.tvText.text= counterPref.getCount().toString()
-
+        pref = CounterPref(context = this)
+        counter = pref.getCount()
+        binding.tvText.text = counter.toString()
         binding.btnIncrement.setOnClickListener {
-            counter++
-            binding.tvText.text = counter.toString()
-            counterPref.saveCount(counter)
+            if (binding.btnIncrement.text == "+") {
+                counter++
+                if (counter >= 10) {
+                    binding.btnIncrement.text = "-"
+                }
+            } else {
+                counter--
+                if (counter <= 0) {
+                    binding.btnIncrement.text = "+"
+                }
+            }
 
+            binding.tvText.text = counter.toString()
+            pref.saveCount(counter)
         }
     }
 }
